@@ -69,7 +69,7 @@ class Impact():
         ifc = ImpactFreqCurve()
         ifc.tag = self.tag
         # Sort descendingly the impacts per events
-        sort_idxs = np.argsort(self.at_event)[::-1]
+        sort_idxs = np.argsort(self.at_event)[::-1]g
         # Calculate exceedence frequency
         exceed_freq = np.cumsum(self.frequency[sort_idxs])
         # Set return period and imact exceeding frequency
