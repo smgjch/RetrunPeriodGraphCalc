@@ -1,8 +1,10 @@
+from GraphDataFrame import GraphDataFrame, GraphPloter
+from Countries import Countries
+from Events import Events
+def main():
+    test = GraphDataFrame()
+    test.read_in_data(-1, Countries.TestCountry,Events.FLOOD)
+    plt = GraphPloter(test.dataframe)
+    plt.plot()
 
-haz = Hazard.from_mat(HAZ_DEMO_MAT)  # Set hazard
-haz.check()
-ent = Entity.from_excel(ENT_TEMPLATE_XLS)  # Set exposures
-ent.check()
-imp = Impact()
-imp.calc(ent.exposures, ent.impact_funcs, haz)
-imp.calc_freq_curve().plot()
+main()
