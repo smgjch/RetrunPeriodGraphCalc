@@ -56,32 +56,34 @@ class GraphDataFrame():
         # print(self.dataframe.iloc[-1, 0])
         return int(self.dataframe.iloc[-1, 1]) - int(self.dataframe.iloc[0, 1])
 
-    def create_frequency(self):
-        total_record = self.get_record_length()
-        count = self.dataframe[self.loss.value].value_counts()/total_record
-        self.dataframe["frequency"] = self.dataframe[self.loss.value].map(count)
+    def get_frequency(self):
+        total_record = self.get_records_number()
+        self.dataframe["frequency"] = pd.value_counts(self.dataframe[self.loss.value])/total_record
 
     def get_records_number(self):
-        return int(self.dataframe.iloc[-1, 0]) - int(self.dataframe.iloc[0, 0]) +1
-
-    def create_probability(self):
-        total_events = self.get_records_number()
-        probability = self.dataframe[self.loss.value].value_counts()/total_events
-        self.dataframe["probability"] = self.dataframe[self.loss.value].map(probability)
+        return int(self.dataframe.iloc[-1, 0]) - int(self.dataframe.iloc[0, 0])
 
 
+    def test(self):
+        test = GraphDataFrame()
+        test.read_in_data([1, 10], Countries.TestCountry, Events.FLOOD, Loss.Death)
 
+        print(test.dataframe[Loss.Death.value])
 
+        test.calculate_return_period()
 
     def calculate_return_period(self):
         ifc = LossFreqCurve()
         sort_index = np.argsort(self.dataframe[self.loss.value])[::-1]
+        # print (sort_index)
+        # print (sort_index[::-1])
         record_length = self.get_record_length()
-        # self.dataframe["exceedance"] = (record_length-sort_index +1)/(record_length+1)
-        # print (self.dataframe[" Deaths"])
-        self.create_probability()
-        self.create_frequency()
-        exceedance_probability = self.dataframe["frequency"][sort_index] * self.dataframe["probability"][sort_index]
+        self.dataframe["exceedance"] = (record_length-sort_index +1)/(record_length+1)
+        # print (self.dataframe["exceedance"])
+        self.get_frequency()
+        print(self.dataframe["frequency"])
+
+        exceedance_probability = np.cumsum(self.dataframe["frequency"][sort_index]/record_length)
         # print(exceedance_probability)
         # print (exceedance_probability)
         #
@@ -92,15 +94,6 @@ class GraphDataFrame():
         return 0
 
 
-class GraphPloter():
-    def __init__(self, graph):
-        self.graph = graph
 
-    def plot(self):
-        x = self.graph.iloc[:, 0]
-        y = self.graph.iloc[:, 1]
-        plt.plot(x, y)
-        plt.xlabel('Loss')
-        plt.ylabel('Return period')
-        # plt.title('Data Plot')
-        plt.show()
+test = GraphDataFrame()
+test.test()
