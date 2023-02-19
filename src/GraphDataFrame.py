@@ -6,7 +6,7 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from LossFreqCurve import LossFreqCurve
+# from LossFreqCurve import LossFreqCurve
 from Loss import Loss
 
 
@@ -56,15 +56,20 @@ class GraphDataFrame():
         # print(self.dataframe.iloc[-1, 0])
         return int(self.dataframe.iloc[-1, 1]) - int(self.dataframe.iloc[0, 1])
 
-    def create_frequency(self):
+    def get_exceedance_period(self):
         total_record = self.get_record_length()
         # count = self.dataframe[self.loss.value].value_counts()
-        sort_index = np.argsort(self.dataframe[self.loss.value])[::-1]
         # print("sort",sort_index)
-        exceedance = np.cumsum(self.dataframe[self.loss.value].value_counts(ascending = True))
-        # print ("exce",exceedance)
-        self.dataframe["frequency"] = self.dataframe[self.loss.value].map(exceedance/5)
+        a= self.dataframe[self.loss.value].value_counts(ascending = True)
+        print(1111111,a)
+        loss_frequency = np.cumsum(self.dataframe[self.loss.value].value_counts(ascending = True).sort_index()[::-1])
+        print ("exce",loss_frequency)
+        tmp = self.dataframe[self.loss.value].map(loss_frequency/total_record)
+        print("tmp",tmp)
+
+        return self.dataframe[self.loss.value].map(loss_frequency/total_record)
         # print ("freq",self.dataframe["frequency"])
+
     def get_records_number(self):
         return int(self.dataframe.iloc[-1, 0]) - int(self.dataframe.iloc[0, 0]) +1
 
@@ -78,15 +83,18 @@ class GraphDataFrame():
 
 
     def calculate_return_period(self):
-        ifc = GraphPloter(self.dataframe)
-        sort_index = np.argsort(self.dataframe[self.loss.value])[::-1]
+        ImpactReturnPeriodGraph = GraphPloter(self.dataframe)
+        exceedance_period = self.get_exceedance_period()
+        sort_index = np.argsort(exceedance_period)[::-1]
+        y = 1/exceedance_period[sort_index]
+        x = self.dataframe[self.loss.value][sort_index]
         # record_length = self.get_record_length()
         # self.dataframe["exceedance"] = (record_length-sort_index +1)/(record_length+1)
         # print (self.dataframe[" Deaths"])
         # self.create_probability()
-        self.create_frequency()
-        ifc.x = 1/self.dataframe["frequency"][::-1]
-        ifc.y = self.dataframe[self.loss.value][::-1]
+        # x = 1/self.get_exceedance_period()[::-1]
+        # y = self.dataframe[self.loss.value][::-1]
+        ImpactReturnPeriodGraph.set_graph(x,y)
 
         # exceedance_probability = self.dataframe["frequency"][sort_index] * self.dataframe["probability"][sort_index]
         # print( self.dataframe["frequency"])
@@ -96,7 +104,7 @@ class GraphDataFrame():
         # ifc.impact = self.dataframe[sort_index][::-1]
         # ifc.label = "Exceedance frequency curve"
 
-        return ifc
+        return ImpactReturnPeriodGraph
 
 
 class GraphPloter():

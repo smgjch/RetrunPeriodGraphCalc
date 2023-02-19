@@ -6,7 +6,7 @@ from Loss import Loss
 
 def main():
     test = GraphDataFrame()
-    test.read_in_data([1,10], Countries.TestCountry,Events.FLOOD,Loss.Death)
+    test.read_in_data([1,10], Countries.Argentina_arg,Events.FLOOD,Loss.Death)
 
     plt = test.calculate_return_period()
     # plt = GraphPloter(test.dataframe)
