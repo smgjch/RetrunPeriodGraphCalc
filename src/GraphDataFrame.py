@@ -58,9 +58,13 @@ class GraphDataFrame():
 
     def create_frequency(self):
         total_record = self.get_record_length()
-        count = self.dataframe[self.loss.value].value_counts()/total_record
-        self.dataframe["frequency"] = self.dataframe[self.loss.value].map(count)
-
+        # count = self.dataframe[self.loss.value].value_counts()
+        sort_index = np.argsort(self.dataframe[self.loss.value])[::-1]
+        # print("sort",sort_index)
+        exceedance = np.cumsum(self.dataframe[self.loss.value].value_counts(ascending = True))
+        # print ("exce",exceedance)
+        self.dataframe["frequency"] = self.dataframe[self.loss.value].map(exceedance/5)
+        # print ("freq",self.dataframe["frequency"])
     def get_records_number(self):
         return int(self.dataframe.iloc[-1, 0]) - int(self.dataframe.iloc[0, 0]) +1
 
@@ -74,32 +78,48 @@ class GraphDataFrame():
 
 
     def calculate_return_period(self):
-        ifc = LossFreqCurve()
+        ifc = GraphPloter(self.dataframe)
         sort_index = np.argsort(self.dataframe[self.loss.value])[::-1]
-        record_length = self.get_record_length()
+        # record_length = self.get_record_length()
         # self.dataframe["exceedance"] = (record_length-sort_index +1)/(record_length+1)
         # print (self.dataframe[" Deaths"])
-        self.create_probability()
+        # self.create_probability()
         self.create_frequency()
-        exceedance_probability = self.dataframe["frequency"][sort_index] * self.dataframe["probability"][sort_index]
-        # print(exceedance_probability)
+        ifc.x = 1/self.dataframe["frequency"][::-1]
+        ifc.y = self.dataframe[self.loss.value][::-1]
+
+        # exceedance_probability = self.dataframe["frequency"][sort_index] * self.dataframe["probability"][sort_index]
+        # print( self.dataframe["frequency"])
         # print (exceedance_probability)
         #
         # ifc.return_period = 1 / exceedance_probability[::-1]
         # ifc.impact = self.dataframe[sort_index][::-1]
         # ifc.label = "Exceedance frequency curve"
 
-        return 0
+        return ifc
 
 
 class GraphPloter():
     def __init__(self, graph):
-        self.graph = graph
+        # self.graph = graph
+        self.x = None
+        self.y = None
+
+    def __set_x(self,x):
+        self.x = x
+
+    def __set_y(self,y):
+        self.y = y
+
+    def set_graph(self,x,y):
+        self.__set_x(x)
+        self.__set_y(y)
+
 
     def plot(self):
-        x = self.graph.iloc[:, 0]
-        y = self.graph.iloc[:, 1]
-        plt.plot(x, y)
+        # x = self.graph[]
+        # y = self.graph.iloc[:, 1]
+        plt.plot(self.x,self.y)
         plt.xlabel('Loss')
         plt.ylabel('Return period')
         # plt.title('Data Plot')

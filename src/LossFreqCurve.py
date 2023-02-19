@@ -49,5 +49,9 @@ class LossFreqCurve():
             axis.plot(self.return_per**-1, self.impact, **kwargs)
         else:
             axis.set_xlabel('Return period (year)')
+
             axis.plot(self.return_per, self.impact, **kwargs)
+
+        print(self.return_per)
+        print(self.impact)
         return axis
