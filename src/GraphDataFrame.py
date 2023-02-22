@@ -5,6 +5,7 @@ from Events import Events
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 # from LossFreqCurve import LossFreqCurve
 from Loss import Loss
@@ -42,7 +43,7 @@ class GraphDataFrame():
         country_path = country.value
         event_path = event.value
 
-        data_CSV = f'{data_dir}/{country_path}/{event_path}.csv'
+        data_CSV = f'{data_dir}/{country_path}/{event_path}s.csv'
         self.dataframe = pd.read_csv(data_CSV)
 
         os.chdir("../")
@@ -54,7 +55,13 @@ class GraphDataFrame():
 
     def get_record_length(self):
         # print(self.dataframe.iloc[-1, 0])
-        return int(self.dataframe.iloc[-1, 1]) - int(self.dataframe.iloc[0, 1])
+        record_end = self.dataframe.iloc[-1, -1]
+        record_start = self.dataframe.iloc[0, -3]
+        start_date = datetime.strptime(record_start, '%Y-%m-%d')
+        end_date = datetime.strptime(record_end, '%Y-%m-%d')
+        delta: datetime.timedelta = end_date-start_date
+
+        return delta.days/365
 
     def get_exceedance_period(self):
         total_record = self.get_record_length()

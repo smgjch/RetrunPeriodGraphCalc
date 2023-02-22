@@ -54,4 +54,5 @@ class LossFreqCurve():
 
         print(self.return_per)
         print(self.impact)
+        # axis.show()
         return axis

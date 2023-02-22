@@ -1,7 +1,7 @@
 from enum import Enum
 
 class Loss(Enum):
-    Deaths = " Deaths"
+    Deaths = "deaths"
     Houses_Destroyed = " Houses Destroyed"
 
 
